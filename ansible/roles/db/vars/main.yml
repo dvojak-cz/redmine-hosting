@@ -1,0 +1,5 @@
+---
+KEYRINGS: "/usr/share/keyrings"
+RELEASE: "{{ansible_distribution_release}}"
+PG_VERSION: "12"
+PG_PASSWORD: postgress

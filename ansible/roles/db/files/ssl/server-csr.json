@@ -1,0 +1,16 @@
+{
+  "CN": "PG",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CZ",
+      "L": "Prague",
+      "O": "dvojak",
+      "OU": "dvojak.cz",
+      "ST": "Czech Republic"
+    }
+  ]
+}

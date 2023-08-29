@@ -1,0 +1,19 @@
+services:
+  c1:
+    image: redmine
+    restart: always
+    networks:
+      - back_channel
+    environment:
+      - REDMINE_DB_POSTGRES=${c1_db_host}
+      - REDMINE_DB_DATABASE=${c1_client_name}
+      - REDMINE_DB_PASSWORD=${c1_db_password}
+      - REDMINE_DB_USERNAME=${c1_client_name}
+
+networks:
+  monitoring:
+    external: true
+    name: monitoring-bridge
+  back_channel:
+    external: true
+    name: back_channel-bridge

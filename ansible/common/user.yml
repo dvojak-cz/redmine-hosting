@@ -1,0 +1,34 @@
+- name: Create required groups
+  loop: "{{USERS | map(attribute='groups') | flatten | unique}}"
+  group:
+    name: "{{item}}"
+    state: present
+
+- name: Add users
+  loop: "{{USERS}}"
+  loop_control:
+    label: "{{item.name}}"
+  user:
+    name: "{{item.name}}"
+    generate_ssh_key: "{{ item.ssh if ssh.ssh is defined else False }}"
+    password: "{{ item.password | default(item.name) | password_hash('sha512') }}"
+    password_lock: "{{ item.password_lock | default(True) }}"
+    append: yes
+    groups: "{{ item.groups | default([]) }}"
+    shell: "{{ item.shell if item.shell is defined else '/bin/bash' }}"
+
+- name: Load public key
+  vars:
+   contents: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  loop: "{{USERS}}"
+  when: item.import_public_key is defined and item.import_public_key
+  ansible.builtin.lineinfile:
+    path: /home/{{item.name}}/.ssh/authorized_keys
+    line: "{{contents}}"
+    create: yes
+
+- name: Edit sudoers
+  loop: "{{USERS | map(attribute='sudoers') | flatten | unique }}"
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    line: "{{item}}"

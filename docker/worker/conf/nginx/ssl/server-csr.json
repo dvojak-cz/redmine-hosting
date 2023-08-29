@@ -1,0 +1,19 @@
+{
+  "CN": "NGINX",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "hosts": [
+      "*.redmine.dvojak.cz"
+  ],
+  "names": [
+    {
+      "C": "CZ",
+      "L": "Prague",
+      "O": "dvojak",
+      "OU": "dvojak.cz",
+      "ST": "Czech Republic"
+    }
+  ]
+}

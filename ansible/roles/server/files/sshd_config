@@ -1,0 +1,11 @@
+Port 22
+ListenAddress 0.0.0.0
+PasswordAuthentication no
+PubkeyAuthentication yes
+X11Forwarding yes
+AllowGroups ssh
+PermitRootLogin no
+ClientAliveInterval 120
+Banner "This system is production one, please be careful."
+AcceptEnv LANG LC_*
+AllowUsers vagrant # for labs

@@ -1,0 +1,2 @@
+---
+RELEASE: "{{ansible_distribution_release}}"

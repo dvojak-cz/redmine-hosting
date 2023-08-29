@@ -1,0 +1,11 @@
+services:
+  debug:
+    image: wbitt/Network-Multitool
+    command: tail -f /dev/null
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
+    name: monitoring-bridge

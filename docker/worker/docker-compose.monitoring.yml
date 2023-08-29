@@ -1,0 +1,32 @@
+services:
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    restart: unless-stopped
+    ports:
+      - "172.16.16.110:9100:9100"
+    volumes:
+      - '/:/host:ro,rslave'
+    networks:
+      - monitoring
+    privileged: true
+  ingress-exporter:
+    image: nginx/nginx-prometheus-exporter
+    command: -nginx.scrape-uri=http://ingress/metrics -web.telemetry-path=/metrics
+    ports:
+      - "172.16.16.110:9113:9113"
+    restart: unless-stopped
+    networks:
+      - monitoring
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  monitoring:
+    external: true
+    name: monitoring-bridge

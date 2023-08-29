@@ -1,0 +1,54 @@
+services:
+  prometeus:
+    image: prom/prometheus
+    ports:
+      - 9099:9090
+    volumes:
+      - /home/jan/dev/freelo/docker/conf/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=3h"
+    networks:
+      - monitoring
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - monitoring
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter
+    command: -nginx.scrape-uri=http://ingress/metrics -web.telemetry-path=/metrics
+    ports:
+      - 9113:9113
+    restart: unless-stopped
+    networks:
+      - monitoring
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+    networks:
+      - monitoring
+    privileged: true
+
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  monitoring:
+    external: true
+    name: monitoring-bridge

@@ -1,0 +1,44 @@
+---
+# tasks file for db
+- name: add key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    keyring: "{{KEYRINGS}}/pgdg.gpg"
+- name: add repo
+  apt_repository:
+    repo: |
+      deb [signed-by={{KEYRINGS}}/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt {{RELEASE}}-pgdg main
+    filename: docker
+- name: install postgresql
+  apt:
+    name: "postgresql-{{PG_VERSION}}"
+    state: latest
+    install_recommends: no
+  notify:
+    - restart postgresql
+    - change default name
+
+- name: Create required directories
+  loop: ["/etc/ssl/postgresql"]
+  file:
+    path: "{{item}}"
+    state: directory
+    recurse: "{{item.recurse | default(false)}}"
+
+- name: copy ssl key
+  loop: ["pg.pem", "pg-key.pem"]
+  copy:
+    src: ssl/{{item}}
+    dest: /etc/ssl/postgresql/{{item}}
+    mode: 0600
+  notify: 
+    - restart postgresql
+    - change default name
+
+- name: conf_db
+  loop: ["postgresql.conf", "pg_hba.conf", "pg_ident.conf", "pg_ctl.conf"]
+  copy:
+    src: postgres/{{item}}
+    dest: /etc/postgresql/{{PG_VERSION}}/main/
+  notify: restart postgresql
+

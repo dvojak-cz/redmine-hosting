@@ -1,0 +1,27 @@
+---
+# tasks file for zfs
+- name: edit zfs preferences
+  copy:
+    src: 90_zfs
+    dest: /etc/apt/preferences.d/90_zfs
+- name: Add contrib repository
+  replace:
+    dest: /etc/apt/sources.list
+    regexp: '^(deb(?!.* contrib).*)'
+    replace: '\1 contrib'
+- name: apt install zfs
+  loop: ["dpkg-dev", "linux-headers-generic", "linux-image-generic"]
+  apt:
+    name: "{{item}}"
+    state: latest
+    install_recommends: no
+    update_cache: yes
+- name: apt install zfs
+  loop: ["zfs-dkms", "zfsutils-linux"]
+  apt:
+    name: "{{item}}"
+    state: latest
+    install_recommends: no
+    update_cache: yes
+  environment:
+    DEBIAN_FRONTEND: noninteractive

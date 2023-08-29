@@ -1,0 +1,7 @@
+---
+# tasks file for server
+- name: Configure ssh.ssh
+  copy:
+    dest: /etc/ssh/sshd_config
+    src: sshd_config
+  notify: restart sshd

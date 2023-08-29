@@ -1,0 +1,42 @@
+---
+# tasks file for docker
+- name: add key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    keyring: "{{KEYRINGS}}/docker.gpg"
+- name: add repo
+  apt_repository:
+    repo: |
+      deb [signed-by={{KEYRINGS}}/docker.gpg] https://download.docker.com/linux/debian {{RELEASE}} stable
+    filename: docker
+
+- name: install docker
+  loop: ["docker-ce", "docker-ce-cli", "docker-compose-plugin"]
+  apt:
+    name: "{{item}}"
+    state: latest
+    install_recommends: no
+  notify: restart docker
+
+- name: Expose docker tcp api
+  block:
+  - name: Create dir
+    file:
+      path: /etc/systemd/system/docker.service.d
+      state: directory
+  - name: Rewrite docker systemctl conf
+    copy:
+      dest: /etc/systemd/system/docker.service.d/override.conf
+      content: |
+        [Service]
+        ExecStart=
+        ExecStart=/usr/bin/dockerd --containerd=/run/containerd/containerd.sock
+  
+  - name: Rewrite docker conf
+    copy:
+      dest: /etc/docker/daemon.json
+      content: |
+        {
+          "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"]
+        }
+  notify: restart docker

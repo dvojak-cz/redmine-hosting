@@ -1,0 +1,56 @@
+- hosts: ["worker", "monitor", "db"]
+  become: true
+  pre_tasks:
+    - name: install basic tools
+      apt:
+        name: ["curl", "gpg", "ca-certificates", "git", "make"]
+        state: latest
+        update_cache: yes
+  roles:
+    - docker
+  tasks:
+    - name: users
+      ansible.builtin.import_tasks:
+        file: "./common/user.yml"
+      vars:
+        USERS:
+          - name: docker
+            ssh: true
+            import_public_key: true
+            password_lock: false
+            sudoers:
+              - docker ALL=(ALL) NOPASSWD:ALL
+            groups:
+              - ssh
+- hosts: db
+  become: true
+  pre_tasks:
+    - name: install basic tools
+      apt:
+        name: ["curl", "gpg", "ca-certificates", "sudo"]
+        state: latest
+        update_cache: yes
+  roles:
+    - zfs
+    - db
+  tasks:
+    - name: users
+      ansible.builtin.import_tasks:
+        file: "./common/user.yml"
+      vars:
+        USERS:
+          - name: ansible
+            ssh: true
+            import_public_key: true
+            password_lock: false
+            sudoers:
+              - ansible ALL=(ALL) NOPASSWD:ALL
+            groups:
+              - ssh
+          - name: tf
+            password: tf
+            ssh: true
+            sudoers:
+              - tf ALL=(ALL) NOPASSWD:ALL
+            groups: ["ssh"]
+            import_public_key: true

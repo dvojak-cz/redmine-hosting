@@ -1,0 +1,25 @@
+services:
+  prometeus:
+    image: prom/prometheus
+    ports:
+      - 9099:9090
+    volumes:
+      - ./conf/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=3h"
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
