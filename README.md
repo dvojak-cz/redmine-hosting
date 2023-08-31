@@ -26,7 +26,7 @@ zvolen, jelikož s ním mám největší zkušenosti
 - `grafana`
 
 ### Tutorial
-Tutorial **will** be available in the doc directory, or at rh.dvojak.cz.
+Tutorial **will** be available in the [doc](./doc) ([tutorial](./doc/tutorial.md)) directory, or at rh.dvojak.cz.
 
 ### TODO
 - use container orchestrator
